@@ -1,10 +1,12 @@
 import Link from 'next/link';
 import Layout from '../components/Layout';
 
+// 'href' is the path of the page in pages folder
+// 'as' is the URL shown in browser
 const PostLink = (props) => (
   <li>
-    <Link href={`/post?title=${props.title}`}>
-      <a>{props.title}</a>
+    <Link href='/posts/[id]' as={`/posts/${props.id}`}>
+      <a>{props.id}</a>
     </Link>
   </li>
 );
@@ -13,9 +15,9 @@ const Index = () => (
   <Layout>
     <p>Home page</p>
     <ul>
-      <PostLink title='Post #1'/>
-      <PostLink title='Post #2'/>
-      <PostLink title='Post #3'/>
+      <PostLink id='post-1'/>
+      <PostLink id='post-2'/>
+      <PostLink id='post-3'/>
     </ul>
   </Layout>
 );
