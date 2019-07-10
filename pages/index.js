@@ -1,22 +1,25 @@
 import React from 'react';
-import Link from 'next/link';
+import BootstrapTable from 'react-bootstrap-table-next';
+import paginationFactory from 'react-bootstrap-table2-paginator';
+import filterFactory, { textFilter } from 'react-bootstrap-table2-filter';
+
+import { paginationOptions } from '../components/settings';
 import Layout from '../components/Layout';
+import PostModal from '../components/PostModal';
 
-// 'href' is the path of the page in pages folder
-// 'as' is the URL shown in browser
-const PostLink = (props) => (
-  <li>
-    <Link href='/posts/[id]' as={`/posts/${props.id}`}>
-      <a>{props.title}</a>
-    </Link>
-  </li>
-);
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'react-bootstrap-table-next/dist/react-bootstrap-table2.min.css';
+import 'react-bootstrap-table2-paginator/dist/react-bootstrap-table2-paginator.min.css';
 
-class Index extends React.Component {
+class PostsTable extends React.Component {
 
   state = {
+    // modal
+    modalIsOpen: false,
+    modalContent: [],
+    // table
     isLoading: true,
-    posts: []
+    posts: [],
   }
 
   componentDidMount() {
@@ -29,26 +32,81 @@ class Index extends React.Component {
       }));
   }
 
-  render() {
+  // modal
+  openModal = (id) => {
+    // fetch data & save it to modalContent
+    fetch('/api/posts/' + id)
+      .then(res => res.json())
+      .then(post => this.setState({
+        modalContent: JSON.parse(post.body),
+        modalIsOpen: true
+      }));
+  }
+
+  closeModal = () => {
+    this.setState({
+      modalIsOpen: false
+    });
+  }
+
+  detailsButton = (cell) => {
+    return (
+      <span
+        onClick={() => this.openModal(cell)}
+        style={{cursor: 'pointer'}}
+      >
+        Details
+      </span>
+    );
+  }
+
+  // table
+  columns = [{
+    dataField: 'objectID',
+    text: 'Id'
+  }, {
+    dataField: 'title',
+    text: 'Title',
+    filter: textFilter({
+      placeholder: 'Search by title...'
+    })
+  }, {
+    dataField: 'author',
+    text: 'Author',
+    filter: textFilter({
+      placeholder: 'Search by author...'
+    })
+  }, {
+    dataField: 'objectID',
+    text: 'Actions',
+    formatter: this.detailsButton
+  }];
+
+  render () {
     return (
       <Layout>
-        <p>Posts</p>
         {
           this.state.isLoading ?
-          <p>Loading ...</p> :
-          <ul>
-            {this.state.posts.map((post) => (
-              <PostLink
-                title={post.title}
-                id={post.objectID}
-                key={post.objectID}
-              />
-            ))}
-          </ul>
+          <div>Loading ...</div> :
+          <div>
+            <BootstrapTable
+              keyField='id'
+              data={this.state.posts}
+              columns={this.columns}
+              filter={filterFactory()}
+              pagination={paginationFactory(paginationOptions)}
+              bootstrap4={true}
+            />
+            <PostModal
+              isOpen={this.state.modalIsOpen}
+              modalContent={this.state.modalContent}
+              onRequestClose={this.closeModal}
+            />
+          </div>
         }
       </Layout>
-    )
+    );
   }
 }
 
-export default Index;
+export default PostsTable;
