@@ -23,7 +23,6 @@ class Index extends React.Component {
     // fetch data & save it to posts
     fetch('/api/posts')
       .then(res => res.json())
-      // .then(posts => console.log(posts));
       .then(posts => this.setState({
         posts: JSON.parse(posts.body).hits,
         isLoading: false
