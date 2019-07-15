@@ -16,7 +16,21 @@ const customStyles = {
   }
 };
 
-class PostModal extends React.Component {
+// types
+export type modalContent = {
+  title: string;
+  author: string;
+  url: string;
+}
+
+type Props = {
+  isOpen: boolean;
+  modalContent: modalContent;
+  onRequestClose(): void;
+}
+
+// component
+class PostModal extends React.Component<Props, {}> {
 
   render () {
     return (

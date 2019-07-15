@@ -21,6 +21,9 @@
   },
   "homepage": "https://github.com/trco/next-learn#readme",
   "dependencies": {
+    "@types/node": "^12.6.2",
+    "@types/react": "^16.8.23",
+    "@types/react-dom": "^16.8.4",
     "@zeit/next-css": "^1.0.1",
     "bootstrap": "^4.3.1",
     "chai": "^4.2.0",
@@ -35,6 +38,7 @@
     "react-dom": "^16.8.6",
     "react-modal": "^3.8.2",
     "request": "^2.88.0",
+    "typescript": "^3.5.3",
     "wait-on": "^3.2.0"
   }
 }

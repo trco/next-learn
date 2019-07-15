@@ -5,18 +5,29 @@ import filterFactory, { textFilter } from 'react-bootstrap-table2-filter';
 
 import { paginationOptions } from '../components/settings';
 import Layout from '../components/Layout';
-import PostModal from '../components/PostModal';
+import PostModal, { modalContent } from '../components/PostModal';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'react-bootstrap-table-next/dist/react-bootstrap-table2.min.css';
 import 'react-bootstrap-table2-paginator/dist/react-bootstrap-table2-paginator.min.css';
 
-class PostsTable extends React.Component {
+type State = {
+  modalIsOpen: boolean;
+  modalContent: modalContent;
+  isLoading: boolean;
+  posts: any[];
+}
 
-  state = {
+class PostsTable extends React.Component<{}, State> {
+
+  state: State = {
     // modal
     modalIsOpen: false,
-    modalContent: [],
+    modalContent: {
+      title: '',
+      author: '',
+      url: ''
+    },
     // table
     isLoading: true,
     posts: [],
@@ -33,7 +44,7 @@ class PostsTable extends React.Component {
   }
 
   // modal
-  openModal = (id) => {
+  openModal = (id: number) => {
     // fetch data & save it to modalContent
     fetch('/api/posts/' + id)
       .then(res => res.json())
@@ -49,7 +60,7 @@ class PostsTable extends React.Component {
     });
   }
 
-  detailsButton = (cell) => {
+  detailsButton = (cell: number) => {
     return (
       <span
         onClick={() => this.openModal(cell)}
