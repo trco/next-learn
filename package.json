@@ -4,9 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "next",
-    "build": "next build",
-    "start": "next start",
+    "build": "npx tsc",
+    "next": "next build",
+    "start": "npx tsc && pm2-runtime --raw start pm2.config.js",
     "test": "concurrently 'npm run dev' 'wait-on http://localhost:3000/ && mocha'"
   },
   "repository": {
@@ -14,7 +14,7 @@
     "url": "git+https://github.com/trco/next-learn.git"
   },
   "keywords": [],
-  "author": "",
+  "author": "Uroš Trstenjak <https://github.com/trco>",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/trco/next-learn/issues"
