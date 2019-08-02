@@ -5,7 +5,7 @@ import filterFactory, { textFilter } from 'react-bootstrap-table2-filter';
 
 import { paginationOptions } from '../components/settings';
 import Layout from '../components/Layout';
-import PostModal, { modalContent } from '../components/PostModal';
+import PostModal, { modalTab1, modalTab2 } from '../components/PostModal';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'react-bootstrap-table-next/dist/react-bootstrap-table2.min.css';
@@ -13,7 +13,9 @@ import 'react-bootstrap-table2-paginator/dist/react-bootstrap-table2-paginator.m
 
 type State = {
   modalIsOpen: boolean;
-  modalContent: modalContent;
+  modalTab1: modalTab1;
+  modalTab2: modalTab2;
+  openTab: number;
   isLoading: boolean;
   posts: any[];
 }
@@ -23,11 +25,17 @@ class PostsTable extends React.Component<{}, State> {
   state: State = {
     // modal
     modalIsOpen: false,
-    modalContent: {
+    modalTab1: {
       title: '',
       author: '',
       url: ''
     },
+    modalTab2: {
+      username: '',
+      about: '',
+      karma: ''
+    },
+    openTab: 0,
     // table
     isLoading: true,
     posts: [],
@@ -44,14 +52,30 @@ class PostsTable extends React.Component<{}, State> {
   }
 
   // modal
-  openModal = (id: number) => {
+  openModal = (param: number|string, modalTab: number) => {
+    // construct fetchUrl
+    const fetchUrl = modalTab == 1 ?
+      '/api/posts/' + param :
+      '/api/users/' + param;
+    console.log(fetchUrl);
     // fetch data & save it to modalContent
-    fetch('/api/posts/' + id)
+    fetch(fetchUrl)
       .then(res => res.json())
-      .then(post => this.setState({
-        modalContent: JSON.parse(post.body),
-        modalIsOpen: true
-      }));
+      .then(post =>
+        // open modalTab1
+        modalTab == 1 ?
+        this.setState({
+          modalTab1: JSON.parse(post.body),
+          modalIsOpen: true,
+          openTab: 1
+        }) :
+        // open modalTab2
+        this.setState({
+          modalTab2: JSON.parse(post.body),
+          modalIsOpen: true,
+          openTab: 2
+        })
+      );
   }
 
   closeModal = () => {
@@ -60,14 +84,23 @@ class PostsTable extends React.Component<{}, State> {
     });
   }
 
-  detailsButton = (cell: number) => {
+  actionButtons = (cell: any, row: {}) => {
+    // access row data through row object
     return (
-      <span
-        onClick={() => this.openModal(cell)}
-        style={{cursor: 'pointer'}}
-      >
-        Details
-      </span>
+      <>
+        <span
+          onClick={() => this.openModal(row['objectID'], 1)}
+          style={{cursor: 'pointer', marginRight: '0.5rem'}}
+        >
+          Details
+        </span>
+        <span
+          onClick={() => this.openModal(row['author'], 2)}
+          style={{cursor: 'pointer'}}
+        >
+          User
+        </span>
+      </>    
     );
   }
 
@@ -88,9 +121,8 @@ class PostsTable extends React.Component<{}, State> {
       placeholder: 'Search by author...'
     })
   }, {
-    dataField: 'objectID',
     text: 'Actions',
-    formatter: this.detailsButton
+    formatter: this.actionButtons,
   }];
 
   render () {
@@ -110,7 +142,9 @@ class PostsTable extends React.Component<{}, State> {
             />
             <PostModal
               isOpen={this.state.modalIsOpen}
-              modalContent={this.state.modalContent}
+              modalTab1={this.state.modalTab1}
+              modalTab2={this.state.modalTab2}
+              openTab={this.state.openTab}
               onRequestClose={this.closeModal}
             />
           </div>

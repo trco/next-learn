@@ -17,22 +17,42 @@ const customStyles = {
 };
 
 // types
-export type modalContent = {
+export type modalTab1 = {
   title: string;
   author: string;
   url: string;
 }
 
+export type modalTab2 = {
+  username: string;
+  about: string;
+  karma: string;
+}
+
 type Props = {
   isOpen: boolean;
-  modalContent: modalContent;
+  modalTab1: modalTab1;
+  modalTab2: modalTab2;
+  openTab: number;
   onRequestClose(): void;
 }
 
-// component
+// Tab component
+class ModalTab extends React.Component<{},{}> {
+
+  render () {
+    return (
+      <div></div>
+    )
+  }
+}
+
+
+// PostModal component
 class PostModal extends React.Component<Props, {}> {
 
   render () {
+    const openTab = this.props.openTab;
     return (
       <Modal
         isOpen={this.props.isOpen}
@@ -40,10 +60,28 @@ class PostModal extends React.Component<Props, {}> {
         style={customStyles}
       >
         <div>
-          <h1>Title: {this.props.modalContent.title}</h1>
-          <p>Author: {this.props.modalContent.author}</p>
-          <p><a href={this.props.modalContent.url}>Link</a></p>
-          <button onClick={this.props.onRequestClose}>Close</button>
+          {(() => {
+            switch(openTab) {
+              case 1:
+                return (
+                  <>
+                    <h1>Title: {this.props.modalTab1.title}</h1>
+                    <p>Author: {this.props.modalTab1.author}</p>
+                    <p><a href={this.props.modalTab1.url}>Link</a></p>
+                    <button onClick={this.props.onRequestClose}>Close</button>
+                  </>
+                )
+              case 2:
+                return (
+                  <>
+                    <h1>User: {this.props.modalTab2.username}</h1>
+                    <p>About: {this.props.modalTab2.about}</p>
+                    <p>Karma: {this.props.modalTab2.karma}</p>
+                    <button onClick={this.props.onRequestClose}>Close</button>
+                  </>
+                  )
+            }
+          })()}
         </div>
       </Modal>
     )
