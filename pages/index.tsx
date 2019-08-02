@@ -15,7 +15,8 @@ type State = {
   modalIsOpen: boolean;
   modalTab1: modalTab1;
   modalTab2: modalTab2;
-  openTab: number;
+  openedTab: number;
+  alreadyOpenedTabs: number[];
   isLoading: boolean;
   posts: any[];
 }
@@ -35,7 +36,8 @@ class PostsTable extends React.Component<{}, State> {
       about: '',
       karma: ''
     },
-    openTab: 0,
+    openedTab: undefined,
+    alreadyOpenedTabs: [],
     // table
     isLoading: true,
     posts: [],
@@ -54,7 +56,7 @@ class PostsTable extends React.Component<{}, State> {
   // modal
   openModal = (param: number|string, modalTab: number) => {
     // construct fetchUrl
-    const fetchUrl = modalTab == 1 ?
+    const fetchUrl = modalTab == 0 ?
       '/api/posts/' + param :
       '/api/users/' + param;
     console.log(fetchUrl);
@@ -63,17 +65,19 @@ class PostsTable extends React.Component<{}, State> {
       .then(res => res.json())
       .then(post =>
         // open modalTab1
-        modalTab == 1 ?
+        modalTab == 0 ?
         this.setState({
           modalTab1: JSON.parse(post.body),
           modalIsOpen: true,
-          openTab: 1
+          openedTab: 0,
+          alreadyOpenedTabs: [...this.state.alreadyOpenedTabs, 0]
         }) :
         // open modalTab2
         this.setState({
           modalTab2: JSON.parse(post.body),
           modalIsOpen: true,
-          openTab: 2
+          openedTab: 1,
+          alreadyOpenedTabs: [...this.state.alreadyOpenedTabs, 1]
         })
       );
   }
@@ -89,13 +93,13 @@ class PostsTable extends React.Component<{}, State> {
     return (
       <>
         <span
-          onClick={() => this.openModal(row['objectID'], 1)}
+          onClick={() => this.openModal(row['objectID'], 0)}
           style={{cursor: 'pointer', marginRight: '0.5rem'}}
         >
           Details
         </span>
         <span
-          onClick={() => this.openModal(row['author'], 2)}
+          onClick={() => this.openModal(row['author'], 1)}
           style={{cursor: 'pointer'}}
         >
           User
@@ -144,8 +148,9 @@ class PostsTable extends React.Component<{}, State> {
               isOpen={this.state.modalIsOpen}
               modalTab1={this.state.modalTab1}
               modalTab2={this.state.modalTab2}
-              openTab={this.state.openTab}
+              openTab={this.state.openedTab}
               onRequestClose={this.closeModal}
+              alreadyOpenedTabs={this.state.alreadyOpenedTabs}
             />
           </div>
         }
