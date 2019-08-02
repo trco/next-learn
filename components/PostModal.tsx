@@ -33,18 +33,14 @@ export type modalTab2 = {
 
 type PostModalProps = {
   isOpen: boolean;
-  openTab: number;
-  modalTab1: modalTab1;
-  modalTab2: modalTab2;
-  alreadyOpenedTabs: number[];
+  modal: {}
+  openedTab: string;
   onRequestClose(): void;
 }
 
 type TabsProps = {
-  openedTab: number;
-  alreadyOpenedTabs: number[];
-  modalTab1: modalTab1;
-  modalTab2: modalTab2;
+  modal: {};
+  openedTab: string;
   onRequestClose(): void;
 }
 
@@ -52,11 +48,12 @@ type TabsProps = {
 class TabsModal extends React.Component<TabsProps,{}> {
 
   fetchData = (eventKey) => {
-    if (!this.props.alreadyOpenedTabs.includes(parseInt(eventKey)))
-      console.log('Not in array');
+    console.log('Not in array');
   }
 
   render () {
+    console.log(this.props.modal['0']);
+    
     return (
       <div>
         <Tabs
@@ -64,29 +61,29 @@ class TabsModal extends React.Component<TabsProps,{}> {
           id="modal-tabs"
           onSelect={(eventKey) => this.fetchData(eventKey)}
         >
-          <Tab eventKey="0" title="Details">
+          <Tab eventKey='0' title='Details'>
             {
-              this.props.openedTab == 0 ?
+              this.props.openedTab === '0' ?
               <>
-                <h1>Title: {this.props.modalTab1.title}</h1>
-                <p>Author: {this.props.modalTab1.author}</p>
-                <p><a href={this.props.modalTab1.url}>Link</a></p>
+                <h1>Title: {this.props.modal['0'].content.title}</h1>
+                <p>Author: {this.props.modal['0'].content.author}</p>
+                <p><a href={this.props.modal['0'].content.url}>Link</a></p>
                 <button onClick={this.props.onRequestClose}>Close</button>
               </> :
               <></>
-            } 
+            }
           </Tab>
-          <Tab eventKey="1" title="User">
-            {
-              this.props.openedTab == 1 ?
+          <Tab eventKey='1' title='User'>
+             {
+              this.props.openedTab === '1' ?
               <>
-                <h1>User: {this.props.modalTab2.username}</h1>
-                <p>About: {this.props.modalTab2.about}</p>
-                <p>Karma: {this.props.modalTab2.karma}</p>
+                <h1>User: {this.props.modal['1'].content.username}</h1>
+                <p>About: {this.props.modal['1'].content.about}</p>
+                <p>Karma: {this.props.modal['1'].content.karma}</p>
                 <button onClick={this.props.onRequestClose}>Close</button>
               </> :
               <></>
-            } 
+            }
           </Tab>
         </Tabs>
       </div>
@@ -106,11 +103,9 @@ class PostModal extends React.Component<PostModalProps, {}> {
       >
         <div>
           <TabsModal
+            modal={this.props.modal}
+            openedTab={this.props.openedTab}
             onRequestClose={this.props.onRequestClose}
-            openedTab={this.props.openTab}
-            modalTab1={this.props.modalTab1}
-            modalTab2={this.props.modalTab2}
-            alreadyOpenedTabs={this.props.alreadyOpenedTabs}
           ></TabsModal>
         </div>
       </Modal>

@@ -13,10 +13,26 @@ import 'react-bootstrap-table2-paginator/dist/react-bootstrap-table2-paginator.m
 
 type State = {
   modalIsOpen: boolean;
-  modalTab1: modalTab1;
-  modalTab2: modalTab2;
-  openedTab: number;
-  alreadyOpenedTabs: number[];
+  modal: {
+    '0': {
+      content: {
+        title: string;
+        author: string;
+        url: string;
+      };
+      fetched: boolean;
+    }
+    '1': {
+      content: {
+        username: string;
+        about: string;
+        karma: string;
+      };
+      fetched: boolean;
+    }
+  };
+  fetchParams: string[];
+  openedTab: string;
   isLoading: boolean;
   posts: any[];
 }
@@ -26,18 +42,28 @@ class PostsTable extends React.Component<{}, State> {
   state: State = {
     // modal
     modalIsOpen: false,
-    modalTab1: {
-      title: '',
-      author: '',
-      url: ''
+    modal: {
+      // modal tab 0
+      '0': {
+        content: {
+          title: '',
+          author: '',
+          url: ''
+        },
+        fetched: false
+      },
+      // modal tab 1
+      '1': {
+        content: {
+          username: '',
+          about: '',
+          karma: ''
+        },
+        fetched: false
+      }
     },
-    modalTab2: {
-      username: '',
-      about: '',
-      karma: ''
-    },
+    fetchParams: [],
     openedTab: undefined,
-    alreadyOpenedTabs: [],
     // table
     isLoading: true,
     posts: [],
@@ -54,32 +80,31 @@ class PostsTable extends React.Component<{}, State> {
   }
 
   // modal
-  openModal = (param: number|string, modalTab: number) => {
+  openModal = (param: string, modalTab: string, fetchParams: string[]) => {
+    const fetchPaths = {
+      '0': '/api/posts/',
+      '1': '/api/users/'
+    }
     // construct fetchUrl
-    const fetchUrl = modalTab == 0 ?
-      '/api/posts/' + param :
-      '/api/users/' + param;
+    const fetchUrl = fetchPaths[modalTab] + param;
     console.log(fetchUrl);
-    // fetch data & save it to modalContent
+    // fetch data & save it to modal
     fetch(fetchUrl)
       .then(res => res.json())
       .then(post =>
-        // open modalTab1
-        modalTab == 0 ?
         this.setState({
-          modalTab1: JSON.parse(post.body),
+          modal: {
+            ...this.state.modal,
+            [modalTab]: {
+              content: JSON.parse(post.body),
+              fetched: true
+            }
+          },
           modalIsOpen: true,
-          openedTab: 0,
-          alreadyOpenedTabs: [...this.state.alreadyOpenedTabs, 0]
-        }) :
-        // open modalTab2
-        this.setState({
-          modalTab2: JSON.parse(post.body),
-          modalIsOpen: true,
-          openedTab: 1,
-          alreadyOpenedTabs: [...this.state.alreadyOpenedTabs, 1]
+          openedTab: modalTab
         })
       );
+    this.setState({ fetchParams: fetchParams });
   }
 
   closeModal = () => {
@@ -89,17 +114,18 @@ class PostsTable extends React.Component<{}, State> {
   }
 
   actionButtons = (cell: any, row: {}) => {
+    const fetchParams: string[] = [row['objectID'], row['author']];
     // access row data through row object
     return (
       <>
         <span
-          onClick={() => this.openModal(row['objectID'], 0)}
+          onClick={() => this.openModal(row['objectID'], '0', fetchParams)}
           style={{cursor: 'pointer', marginRight: '0.5rem'}}
         >
           Details
         </span>
         <span
-          onClick={() => this.openModal(row['author'], 1)}
+          onClick={() => this.openModal(row['author'], '1', fetchParams)}
           style={{cursor: 'pointer'}}
         >
           User
@@ -146,11 +172,9 @@ class PostsTable extends React.Component<{}, State> {
             />
             <PostModal
               isOpen={this.state.modalIsOpen}
-              modalTab1={this.state.modalTab1}
-              modalTab2={this.state.modalTab2}
-              openTab={this.state.openedTab}
+              modal={this.state.modal}
+              openedTab={this.state.openedTab}
               onRequestClose={this.closeModal}
-              alreadyOpenedTabs={this.state.alreadyOpenedTabs}
             />
           </div>
         }
