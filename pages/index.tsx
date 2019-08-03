@@ -172,6 +172,7 @@ class PostsTable extends React.Component<{}, State> {
       placeholder: 'Search by author...'
     })
   }, {
+    dataField: 'objectID',
     text: 'Actions',
     formatter: this.actionButtons,
   }];
