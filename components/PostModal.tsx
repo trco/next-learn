@@ -31,35 +31,30 @@ export type modalTab2 = {
   karma: string;
 }
 
-type PostModalProps = {
+type ModalProps = {
   isOpen: boolean;
   modal: {}
   openedTab: string;
-  onRequestClose(): void;
-}
-
-type TabsProps = {
-  modal: {};
-  openedTab: string;
+  fetchParams: string[];
+  fetchTabData(param: string, modalTab: string): void;
   onRequestClose(): void;
 }
 
 // Tabs component
-class TabsModal extends React.Component<TabsProps,{}> {
+class TabsModal extends React.Component<ModalProps,{}> {
 
-  fetchData = (eventKey) => {
-    console.log('Not in array');
+  fetchTabData = (eventKey: string) => {
+    const param = this.props.fetchParams[eventKey];
+    this.props.fetchTabData(param, eventKey);
   }
 
   render () {
-    console.log(this.props.modal['0']);
-    
     return (
       <div>
         <Tabs
-          defaultActiveKey={this.props.openedTab }
+          defaultActiveKey={this.props.openedTab}
           id="modal-tabs"
-          onSelect={(eventKey) => this.fetchData(eventKey)}
+          onSelect={(eventKey: string) => this.fetchTabData(eventKey)}
         >
           <Tab eventKey='0' title='Details'>
             {
@@ -92,7 +87,7 @@ class TabsModal extends React.Component<TabsProps,{}> {
 }
 
 // PostModal component
-class PostModal extends React.Component<PostModalProps, {}> {
+class PostModal extends React.Component<ModalProps, {}> {
 
   render () {
     return (
@@ -103,8 +98,11 @@ class PostModal extends React.Component<PostModalProps, {}> {
       >
         <div>
           <TabsModal
+            isOpen={this.props.isOpen}
             modal={this.props.modal}
             openedTab={this.props.openedTab}
+            fetchParams={this.props.fetchParams}
+            fetchTabData={this.props.fetchTabData}
             onRequestClose={this.props.onRequestClose}
           ></TabsModal>
         </div>

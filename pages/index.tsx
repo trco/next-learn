@@ -39,29 +39,31 @@ type State = {
 
 class PostsTable extends React.Component<{}, State> {
 
+  initialModal = {
+    // modal tab 0
+    '0': {
+      content: {
+        title: '',
+        author: '',
+        url: ''
+      },
+      fetched: false
+    },
+    // modal tab 1
+    '1': {
+      content: {
+        username: '',
+        about: '',
+        karma: ''
+      },
+      fetched: false
+    }
+  }
+
   state: State = {
     // modal
     modalIsOpen: false,
-    modal: {
-      // modal tab 0
-      '0': {
-        content: {
-          title: '',
-          author: '',
-          url: ''
-        },
-        fetched: false
-      },
-      // modal tab 1
-      '1': {
-        content: {
-          username: '',
-          about: '',
-          karma: ''
-        },
-        fetched: false
-      }
-    },
+    modal: this.initialModal,
     fetchParams: [],
     openedTab: undefined,
     // table
@@ -80,40 +82,49 @@ class PostsTable extends React.Component<{}, State> {
   }
 
   // modal
-  openModal = (param: string, modalTab: string, fetchParams: string[]) => {
-    const fetchPaths = {
-      '0': '/api/posts/',
-      '1': '/api/users/'
+  fetchTabData = (param: string, modalTab: string) => {
+    if (!this.state.modal[modalTab].fetched) {
+      const fetchPaths = {
+        '0': '/api/posts/',
+        '1': '/api/users/'
+      }
+      // construct fetchUrl
+      const fetchUrl = fetchPaths[modalTab] + param;
+      // fetch data & save it to modal
+      fetch(fetchUrl)
+        .then(res => res.json())
+        .then(post =>
+          this.setState({
+            modal: {
+              ...this.state.modal,
+              [modalTab]: {
+                content: JSON.parse(post.body),
+                fetched: true
+              }
+            },
+            modalIsOpen: true,
+            openedTab: modalTab
+          })
+        );
+    } else {
+      this.setState({ openedTab: modalTab });
     }
-    // construct fetchUrl
-    const fetchUrl = fetchPaths[modalTab] + param;
-    console.log(fetchUrl);
-    // fetch data & save it to modal
-    fetch(fetchUrl)
-      .then(res => res.json())
-      .then(post =>
-        this.setState({
-          modal: {
-            ...this.state.modal,
-            [modalTab]: {
-              content: JSON.parse(post.body),
-              fetched: true
-            }
-          },
-          modalIsOpen: true,
-          openedTab: modalTab
-        })
-      );
+  }
+
+  openModal = (param: string, modalTab: string, fetchParams: string[]) => {
+    this.fetchTabData(param, modalTab);
     this.setState({ fetchParams: fetchParams });
   }
 
   closeModal = () => {
     this.setState({
+      modal: this.initialModal,
       modalIsOpen: false
     });
   }
 
   actionButtons = (cell: any, row: {}) => {
+    // save all fetch params
     const fetchParams: string[] = [row['objectID'], row['author']];
     // access row data through row object
     return (
@@ -174,6 +185,8 @@ class PostsTable extends React.Component<{}, State> {
               isOpen={this.state.modalIsOpen}
               modal={this.state.modal}
               openedTab={this.state.openedTab}
+              fetchParams={this.state.fetchParams}
+              fetchTabData={this.fetchTabData}
               onRequestClose={this.closeModal}
             />
           </div>
