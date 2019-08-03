@@ -30,9 +30,9 @@ type State = {
       };
       fetched: boolean;
     },
-    openedTab: string
+    openedTab: string;
+    fetchParams: string[];
   };
-  fetchParams: string[];
   isLoading: boolean;
   posts: any[];
 }
@@ -58,14 +58,14 @@ class PostsTable extends React.Component<{}, State> {
       },
       fetched: false
     },
-    openedTab: undefined
+    openedTab: undefined,
+    fetchParams: []
   }
 
   state: State = {
     // modal
     modalIsOpened: false,
     modal: this.initialModal,
-    fetchParams: [],
     // table
     isLoading: true,
     posts: [],
@@ -118,7 +118,12 @@ class PostsTable extends React.Component<{}, State> {
 
   openModal = (param: string, modalTab: string, fetchParams: string[]) => {
     this.fetchTabData(param, modalTab);
-    this.setState({ fetchParams: fetchParams });
+    this.setState({
+      modal: {
+        ...this.state.modal,
+        fetchParams: fetchParams
+      }
+    });
   }
 
   closeModal = () => {
@@ -189,7 +194,6 @@ class PostsTable extends React.Component<{}, State> {
             <PostModal
               modalIsOpened={this.state.modalIsOpened}
               modal={this.state.modal}
-              fetchParams={this.state.fetchParams}
               fetchTabData={this.fetchTabData}
               onRequestClose={this.closeModal}
             />

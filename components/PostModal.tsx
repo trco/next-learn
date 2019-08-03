@@ -22,7 +22,6 @@ const customStyles = {
 type ModalProps = {
   modalIsOpened: boolean;
   modal: {}
-  fetchParams: string[];
   fetchTabData(param: string, modalTab: string): void;
   onRequestClose(): void;
 }
@@ -31,7 +30,7 @@ type ModalProps = {
 class TabsModal extends React.Component<ModalProps,{}> {
 
   fetchTabData = (eventKey: string) => {
-    const param = this.props.fetchParams[eventKey];
+    const param = this.props.modal['fetchParams'][eventKey];
     this.props.fetchTabData(param, eventKey);
   }
 
@@ -87,7 +86,6 @@ class PostModal extends React.Component<ModalProps, {}> {
           <TabsModal
             modalIsOpened={this.props.modalIsOpened}
             modal={this.props.modal}
-            fetchParams={this.props.fetchParams}
             fetchTabData={this.props.fetchTabData}
             onRequestClose={this.props.onRequestClose}
           ></TabsModal>
