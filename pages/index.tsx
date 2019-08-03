@@ -5,14 +5,14 @@ import filterFactory, { textFilter } from 'react-bootstrap-table2-filter';
 
 import { paginationOptions } from '../components/settings';
 import Layout from '../components/Layout';
-import PostModal, { modalTab1, modalTab2 } from '../components/PostModal';
+import PostModal from '../components/PostModal';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'react-bootstrap-table-next/dist/react-bootstrap-table2.min.css';
 import 'react-bootstrap-table2-paginator/dist/react-bootstrap-table2-paginator.min.css';
 
 type State = {
-  modalIsOpen: boolean;
+  modalIsOpened: boolean;
   modal: {
     '0': {
       content: {
@@ -29,10 +29,10 @@ type State = {
         karma: string;
       };
       fetched: boolean;
-    }
+    },
+    openedTab: string
   };
   fetchParams: string[];
-  openedTab: string;
   isLoading: boolean;
   posts: any[];
 }
@@ -57,15 +57,15 @@ class PostsTable extends React.Component<{}, State> {
         karma: ''
       },
       fetched: false
-    }
+    },
+    openedTab: undefined
   }
 
   state: State = {
     // modal
-    modalIsOpen: false,
+    modalIsOpened: false,
     modal: this.initialModal,
     fetchParams: [],
-    openedTab: undefined,
     // table
     isLoading: true,
     posts: [],
@@ -100,14 +100,19 @@ class PostsTable extends React.Component<{}, State> {
               [modalTab]: {
                 content: JSON.parse(post.body),
                 fetched: true
-              }
+              },
+              openedTab: modalTab
             },
-            modalIsOpen: true,
-            openedTab: modalTab
+            modalIsOpened: true,
           })
         );
     } else {
-      this.setState({ openedTab: modalTab });
+      this.setState({
+        modal: {
+          ...this.state.modal,
+          openedTab: modalTab
+        }
+      });
     }
   }
 
@@ -119,7 +124,7 @@ class PostsTable extends React.Component<{}, State> {
   closeModal = () => {
     this.setState({
       modal: this.initialModal,
-      modalIsOpen: false
+      modalIsOpened: false
     });
   }
 
@@ -182,9 +187,8 @@ class PostsTable extends React.Component<{}, State> {
               bootstrap4={true}
             />
             <PostModal
-              isOpen={this.state.modalIsOpen}
+              modalIsOpened={this.state.modalIsOpened}
               modal={this.state.modal}
-              openedTab={this.state.openedTab}
               fetchParams={this.state.fetchParams}
               fetchTabData={this.fetchTabData}
               onRequestClose={this.closeModal}

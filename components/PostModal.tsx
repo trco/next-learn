@@ -19,22 +19,9 @@ const customStyles = {
 };
 
 // types
-export type modalTab1 = {
-  title: string;
-  author: string;
-  url: string;
-}
-
-export type modalTab2 = {
-  username: string;
-  about: string;
-  karma: string;
-}
-
 type ModalProps = {
-  isOpen: boolean;
+  modalIsOpened: boolean;
   modal: {}
-  openedTab: string;
   fetchParams: string[];
   fetchTabData(param: string, modalTab: string): void;
   onRequestClose(): void;
@@ -52,13 +39,13 @@ class TabsModal extends React.Component<ModalProps,{}> {
     return (
       <div>
         <Tabs
-          defaultActiveKey={this.props.openedTab}
+          defaultActiveKey={this.props.modal['openedTab']}
           id="modal-tabs"
           onSelect={(eventKey: string) => this.fetchTabData(eventKey)}
         >
           <Tab eventKey='0' title='Details'>
             {
-              this.props.openedTab === '0' ?
+              this.props.modal['openedTab'] === '0' ?
               <>
                 <h1>Title: {this.props.modal['0'].content.title}</h1>
                 <p>Author: {this.props.modal['0'].content.author}</p>
@@ -70,7 +57,7 @@ class TabsModal extends React.Component<ModalProps,{}> {
           </Tab>
           <Tab eventKey='1' title='User'>
              {
-              this.props.openedTab === '1' ?
+              this.props.modal['openedTab'] === '1' ?
               <>
                 <h1>User: {this.props.modal['1'].content.username}</h1>
                 <p>About: {this.props.modal['1'].content.about}</p>
@@ -92,15 +79,14 @@ class PostModal extends React.Component<ModalProps, {}> {
   render () {
     return (
       <Modal
-        isOpen={this.props.isOpen}
+        isOpen={this.props.modalIsOpened}
         onRequestClose={this.props.onRequestClose}
         style={customStyles}
       >
         <div>
           <TabsModal
-            isOpen={this.props.isOpen}
+            modalIsOpened={this.props.modalIsOpened}
             modal={this.props.modal}
-            openedTab={this.props.openedTab}
             fetchParams={this.props.fetchParams}
             fetchTabData={this.props.fetchTabData}
             onRequestClose={this.props.onRequestClose}
